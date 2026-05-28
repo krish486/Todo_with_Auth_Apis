@@ -1,6 +1,9 @@
+require("dotenv").config();   //Configuring dotenv
+let app = require("./src/app");
+const connectDB = require("./src/config/db");
 
-let app = require("./src/app")
-
+//------connecting DB with server
+connectDB()
 
 
 //-----create server
