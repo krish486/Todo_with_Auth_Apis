@@ -1,5 +1,6 @@
 let express = require("express")
 let authRoutes = require("./routes/auth.routes")
+let noteRoutes = require("./routes/note.routes")
 let cookieParser = require("cookie-parser")
 
 let app = express()
@@ -13,9 +14,17 @@ app.use(express.json())
 app.use(cookieParser())
 
 
-//--connecting routes with app
+/**
+ * Registers authentication-related routes
+ *@description Handles  registration, and user authentication APIs
+ */
 app.use("/auth", authRoutes)
 
+/**
+ * Registers note-related routes
+ * @description Handles CRUD operations for notes
+ */
+app.use("/note", noteRoutes)
 
 
 
