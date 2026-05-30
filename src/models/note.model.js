@@ -1,15 +1,53 @@
 const { default: mongoose } = require("mongoose");
 
-//----creating note-Schema for notes
-let noteSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    email: String,
-}, { timestamps: true })
+/**
+ * ============================================================================
+ * NOTE SCHEMA
+ * Defines the structure of note documents stored in MongoDB
+ * ============================================================================
+ */
+const noteSchema = new mongoose.Schema(
+    {
+        /**
+         * Title of the note
+         */
+        title: {
+            type: String,
+            trim: true,
+        },
 
+        /**
+         * Main content / description of the note
+         */
+        description: {
+            type: String,
+            trim: true,
+        },
 
-//----creating note-Model for notes
-let noteModel = mongoose.model("note", noteSchema)
+        /**
+         * Email of the user who owns the note
+         */
+        email: {
+            type: String,
+            trim: true,
+        },
+    },
+    {
+        /**
+         * Automatically adds:
+         * createdAt
+         * updatedAt
+         */
+        timestamps: true,
+    }
+);
 
+/**
+ * ============================================================================
+ * NOTE MODEL
+ * Creates and exports the Note collection model
+ * ============================================================================
+ */
+const noteModel = mongoose.model("note", noteSchema);
 
-module.exports = noteModel
+module.exports = noteModel;
