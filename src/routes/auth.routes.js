@@ -1,5 +1,5 @@
 let express = require("express");
-const authController = require("../controllers/auth.controllers");
+let { registerController, loginController } = require("../controllers/auth.controllers")
 let router = express.Router();
 
 
@@ -9,7 +9,14 @@ let router = express.Router();
  * Creates a new account after validating user data
  * @access Public
  */
-router.post("/register", authController)
+router.post("/register", registerController)
 
+
+/**
+ * @route POST/auth/login
+ * @description Handles user login
+ * @access Public
+ */
+router.post("/login", loginController)
 
 module.exports = router

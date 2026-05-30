@@ -3,7 +3,7 @@ const authModel = require("../models/auth.model");
 let jwt = require("jsonwebtoken")
 
 ///----CREATING CONTROLLER FOR REGISTER
-let authController = async (req, res) => {
+let registerController = async (req, res) => {
     try {
         let { name, email } = req.body;
 
@@ -40,4 +40,16 @@ let authController = async (req, res) => {
     }
 }
 
-module.exports = authController
+
+let loginController = async (req, res) => {
+    try {
+        
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+module.exports = { registerController, loginController }
