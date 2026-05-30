@@ -2,48 +2,114 @@ const authModel = require("../models/auth.model");
 
 let jwt = require("jsonwebtoken")
 
-///----CREATING CONTROLLER FOR REGISTER
-let registerController = async (req, res) => {
+/**
+ * ============================================================================
+ * @CONTROLLER     registerController
+ * @METHOD         POST
+ * @ROUTE          /auth/register
+ * @DESCRIPTION    Registers a new user and generates JWT token
+ * ============================================================================
+ */
+
+const registerController = async (req, res) => {
     try {
-        let { name, email } = req.body;
+        /**
+         * Extract user data from request body
+         */
+        const { name, email, password } = req.body;
 
-        ///----------validation--------------------------------------
-        if (!name) return req.status(400).json({ message: "name required" })
-        if (!email) return req.status(400).json({ message: "email required" });
+        /**
+         * ========================================================================
+         * BASIC VALIDATION
+         * ========================================================================
+         */
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!name)
+            return res.status(400).json({
+                message: "Name is required",
+            });
+
+        if (!email)
+            return res.status(400).json({
+                message: "Email is required",
+            });
+
+        if (!password)
+            return res.status(400).json({
+                message: "Password is required",
+            });
+
+        /**
+         * Email format validation using Regex
+         */
+        const emailRegex =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailRegex.test(email))
+            return res.status(400).json({
+                message: "Invalid email format",
+            });
 
 
-        //----checking email format ----------------------
-        if (!emailRegex.test(email)) return res.status(400).json({ message: "Invalid email format" })
+
+        /**
+        * checking if user alredy exist or not
+        */
+        let exist = await authModel.findOne({ email })
+        if (exist) {
+            return res.status(409).json({
+                message: "User already exists",
+            });
+        }
 
 
-        let newUser = await authModel.create({
+
+        /**
+         * ========================================================================
+         * CREATE NEW USER
+         * Password hashing is handled automatically
+         * by the schema pre-save middleware
+         * ========================================================================
+         */
+        const newUser = await authModel.create({
             name,
-            email
-        })
+            email,
+            password,
+        });
 
-        let token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
 
-        res.cookie("token", token)
 
+        /**
+         * Generate JWT token for newly registered user
+         */
+        const token = newUser.generateJWT();
+
+        /**
+         * Store JWT token in browser cookie
+         */
+        res.cookie("token", token);
+
+        /**
+         * Send success response
+         */
         return res.status(201).json({
-            message: "user register successfully",
-            newUser
-        })
-
+            message: "User registered successfully",
+            token,
+        });
     } catch (error) {
+        /**
+         * Handle unexpected server errors
+         */
         return res.status(500).json({
-            message: "internal server error",
-            error: error.message
-        })
+            message: "Internal server error",
+            error: error.message,
+        });
     }
-}
+};
 
 
 let loginController = async (req, res) => {
     try {
-        
 
     } catch (error) {
         return res.status(500).json({
