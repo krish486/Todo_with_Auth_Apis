@@ -111,10 +111,72 @@ const registerController = async (req, res) => {
 let loginController = async (req, res) => {
     try {
 
+        let { email, password } = req.body;
+        /**
+         * ========================================================================
+         * BASIC VALIDATION
+         * ========================================================================
+         */
+
+
+        if (!email)
+            return res.status(400).json({
+                message: "Email is required",
+            });
+
+        if (!password)
+            return res.status(400).json({
+                message: "Password is required",
+            });
+
+        /**
+         * Email format validation using Regex
+         */
+        const emailRegex =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailRegex.test(email))
+            return res.status(400).json({
+                message: "Invalid email format",
+            });
+
+        /**
+        * checking if user alredy exist or not
+        */
+        let exist = await authModel.findOne({ email })
+        if (!exist) {
+            return res.status(409).json({
+                message: "User do not exist",
+            });
+        }
+
+
+        /**
+         * Generate JWT token for existing user
+         */
+        let token = exist.generateJWT();
+
+        /**
+         * Store JWT token in browser cookie
+         */
+        res.cookie("token", token);
+
+        /**
+         * Send success response
+         */
+        return res.status(201).json({
+            message: "User logged-in successfully",
+            token,
+        });
+
     } catch (error) {
+        /**
+         * Handle unexpected server errors
+         */
         return res.status(500).json({
-            message: error.message
-        })
+            message: "Internal server error",
+            error: error.message,
+        });
     }
 }
 
